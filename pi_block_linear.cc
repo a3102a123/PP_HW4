@@ -9,6 +9,8 @@
 
 using namespace std;
 
+double inv_max = 2.0 / RAND_MAX;
+
 int main(int argc, char **argv)
 {
     // --- DON'T TOUCH ---
@@ -21,7 +23,7 @@ int main(int argc, char **argv)
     MPI_Comm_size(MPI_COMM_WORLD,&world_size);
     MPI_Comm_rank(MPI_COMM_WORLD,&world_rank);
     long long int range = tosses / world_size , begin_idx = 0,begin,end; 
-    static unsigned int seed = time(NULL) + world_rank;
+    static unsigned int seed = time(NULL) * world_rank;
     double distance_squared,x,y;
     begin = range * world_rank;
     end = min(range * (world_rank + 1) , tosses);
@@ -33,8 +35,8 @@ int main(int argc, char **argv)
     srand(seed);
     // TODO: handle workers
     for(int i = begin ; i < end ; i++){
-        x = ( 1.0 - (-1.0) ) * (double)rand() / RAND_MAX  + (-1.0);
-        y = ( 1.0 - (-1.0) ) * (double)rand() / RAND_MAX  + (-1.0);
+        x = (double)rand() * inv_max  + (-1.0);
+        y = (double)rand() * inv_max  + (-1.0);
         distance_squared = x * x + y * y;
         if ( distance_squared <= 1)
             count++;
