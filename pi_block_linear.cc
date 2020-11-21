@@ -22,8 +22,7 @@ int main(int argc, char **argv)
     MPI_Comm_rank(MPI_COMM_WORLD,&world_rank);
     long long int range = tosses / world_size , begin_idx = 0,begin,end; 
     static unsigned int seed = time(NULL) + world_rank;
-    long long int x,y;
-    double distance_squared;
+    double distance_squared,x,y;
     begin = range * world_rank;
     end = min(range * (world_rank + 1) , tosses);
     long long int count = 0;
@@ -37,7 +36,6 @@ int main(int argc, char **argv)
         x = ( 1.0 - (-1.0) ) * (double)rand() / RAND_MAX  + (-1.0);
         y = ( 1.0 - (-1.0) ) * (double)rand() / RAND_MAX  + (-1.0);
         distance_squared = x * x + y * y;
-        printf("%lf ",distance_squared);
         if ( distance_squared <= 1)
             count++;
     }
@@ -52,7 +50,6 @@ int main(int argc, char **argv)
         long long int temp;
         for(int source = 1 ; source < world_size ; source++){
             MPI_Recv(&temp, 1, MPI_LONG_LONG, source, 0, MPI_COMM_WORLD, &status);
-            printf("%lld\n",temp);
             count += temp;
         }
         // TODO: master
@@ -61,7 +58,7 @@ int main(int argc, char **argv)
     if (world_rank == 0)
     {
         // TODO: process PI result
-        double pi_estimate = 4 * count /(( double ) tosses);
+        pi_result = 4.0 * (double)count /(( double ) tosses);
         // --- DON'T TOUCH ---
         double end_time = MPI_Wtime();
         printf("%lf\n", pi_result);
