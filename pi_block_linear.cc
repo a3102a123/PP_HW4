@@ -34,8 +34,8 @@ int main(int argc, char **argv)
     srand(seed);
     // TODO: handle workers
     for(int i = begin ; i < end ; i++){
-        x = rand();
-        y = rand();
+        x = ( 1.0 - (-1.0) ) * (double)rand() / RAND_MAX  + (-1.0);
+        y = ( 1.0 - (-1.0) ) * (double)rand() / RAND_MAX  + (-1.0);
         distance_squared = x * x + y * y;
         printf("%lf ",distance_squared);
         if ( distance_squared <= 1)
