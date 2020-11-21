@@ -9,10 +9,10 @@ int main(int argc, char **argv)
   MPI_Init(NULL, NULL);
 
   // TODO: Get the number of processes
-  int world_size;
+  int world_size = MPI_Comm_size() ;
 
   // TODO: Get the rank of the process
-  int world_rank;
+  int world_rank = MPI_Comm_rank() ;
 
   // Get the name of the processor
   char processor_name[MPI_MAX_PROCESSOR_NAME];
