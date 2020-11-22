@@ -4,6 +4,11 @@
 #include <time.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <algorithm>
+#include <math.h>
+
+using namespace std;
+double inv_max = 2.0 / RAND_MAX;
 
 int main(int argc, char **argv)
 {
