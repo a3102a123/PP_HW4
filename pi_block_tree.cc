@@ -47,15 +47,16 @@ int main(int argc, char **argv)
     MPI_Status status; 
     long long int temp;
 
-    while (time <= world_size){
+    while (time < world_size){
         if( id % 2){
             dst = world_rank - time;
             MPI_Send(&count ,1 ,MPI_LONG_LONG,dst ,0 ,MPI_COMM_WORLD );
             break;
         }
         else{
+	     source = world_rank + time;
              MPI_Recv(&temp, 1, MPI_LONG_LONG, source, 0, MPI_COMM_WORLD, &status);
-            count += temp;
+             count += temp;
         }
         time *= 2;
         id /= 2;
