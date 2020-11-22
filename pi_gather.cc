@@ -50,10 +50,8 @@ int main(int argc, char **argv)
     {
         long long int temp[world_size];
         MPI_Gather(&count ,1 ,MPI_LONG_LONG,temp,1 ,MPI_LONG_LONG,root ,MPI_COMM_WORLD );
-        int i ;
-        for(i = 0,count = 0 ; i < world_size ;i++){
+        for(int i = 1 ; i < world_size ;i++){
             count += temp[i];
-            printf("%lld\n",temp[i]);
         }
         // TODO: master
     }
