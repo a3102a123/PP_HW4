@@ -22,7 +22,7 @@ int main(int argc, char **argv)
     // ---
     MPI_Comm_size(MPI_COMM_WORLD,&world_size);
     MPI_Comm_rank(MPI_COMM_WORLD,&world_rank);
-    long long int range = tosses / world_size , begin_idx = 0,begin,end; 
+    long long int range = ceil(tosses / (float)world_size) , begin_idx = 0,begin,end; 
     static unsigned int seed = time(NULL) * world_rank;
     double distance_squared,x,y;
     begin = range * world_rank;
