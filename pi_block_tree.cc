@@ -54,9 +54,9 @@ int main(int argc, char **argv)
             break;
         }
         else{
-	     source = world_rank + time;
-             MPI_Recv(&temp, 1, MPI_LONG_LONG, source, 0, MPI_COMM_WORLD, &status);
-             count += temp;
+	        source = world_rank + time;
+            MPI_Recv(&temp, 1, MPI_LONG_LONG, source, 0, MPI_COMM_WORLD, &status);
+            count += temp;
         }
         time *= 2;
         id /= 2;

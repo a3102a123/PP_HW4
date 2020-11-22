@@ -4,6 +4,12 @@
 #include <time.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <math.h>
+#include <algorithm>
+
+using namespace std;
+
+double inv_max = 2.0 / RAND_MAX;
 
 int main(int argc, char **argv)
 {
@@ -16,24 +22,47 @@ int main(int argc, char **argv)
     // ---
 
     // TODO: MPI init
+    MPI_Comm_size(MPI_COMM_WORLD,&world_size);
+    MPI_Comm_rank(MPI_COMM_WORLD,&world_rank);
+    long long int range = ceil(tosses / (float)world_size) , begin_idx = 0,begin,end; 
+    static unsigned int seed = time(NULL) * world_rank;
+    double distance_squared,x,y;
+    long long int count = 0;
+    int dst = 0;
+
+    begin = range * world_rank;
+    end = min(range * (world_rank + 1) , tosses);
+
+    srand(seed);
+    // TODO: handle workers
+    for(int i = begin ; i < end ; i++){
+        x = (double)rand() * inv_max  + (-1.0);
+        y = (double)rand() * inv_max  + (-1.0);
+        distance_squared = x * x + y * y;
+        if ( distance_squared <= 1)
+            count++;
+    }
 
     if (world_rank > 0)
     {
         // TODO: MPI workers
+        MPI_Isend(&count ,1 ,MPI_LONG_LONG,dst ,0 ,MPI_COMM_WORLD ,MPI_STATUS_IGNORE );
     }
     else if (world_rank == 0)
     {
         // TODO: non-blocking MPI communication.
         // Use MPI_Irecv, MPI_Wait or MPI_Waitall.
-        MPI_Request requests[];
-
-        MPI_Waitall();
+        MPI_Request requests[world_size];
+        long long int temp[world_size];
+        for(int i = 0 ; i < world_size ; i++)
+            MPI_Irecv(temp + i, 1, MPI_LONG_LONG, i, 0, MPI_COMM_WORLD, requests + i)
+        MPI_Waitall(world_size, requests, MPI_STATUS_IGNORE);
     }
 
     if (world_rank == 0)
     {
         // TODO: PI result
-
+        pi_result = 4.0 * (double)count /(( double ) tosses);
         // --- DON'T TOUCH ---
         double end_time = MPI_Wtime();
         printf("%lf\n", pi_result);
