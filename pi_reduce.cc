@@ -4,6 +4,11 @@
 #include <time.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <algorithm>
+#include <math.h>
+
+using namespace std;
+double inv_max = 2.0 / RAND_MAX;
 
 int main(int argc, char **argv)
 {
@@ -16,13 +21,42 @@ int main(int argc, char **argv)
     // ---
 
     // TODO: MPI init
+    MPI_Comm_size(MPI_COMM_WORLD,&world_size);
+    MPI_Comm_rank(MPI_COMM_WORLD,&world_rank);
+    long long int range = ceil(tosses / (float)world_size) , begin_idx = 0,begin,end; 
+    static unsigned int seed = time(NULL) * world_rank;
+    double distance_squared,x,y;
+    long long int count = 0;
+    int root = 0;
 
-    // TODO: use MPI_Reduce
+    begin = range * world_rank;
+    end = min(range * (world_rank + 1) , tosses);
+
+    srand(seed);
+    // TODO: handle workers
+    for(int i = begin ; i < end ; i++){
+        x = (double)rand() * inv_max  + (-1.0);
+        y = (double)rand() * inv_max  + (-1.0);
+        distance_squared = x * x + y * y;
+        if ( distance_squared <= 1)
+            count++;
+    }
+
+    if (world_rank > 0)
+    {
+        MPI_Reduce(&count ,1 ,MPI_LONG_LONG,NULL,1 ,MPI_LONG_LONG,root ,MPI_COMM_WORLD );
+    }
+    else if (world_rank == 0)
+    {
+        long long int sum;
+        MPI_Reduce(&count ,1 ,MPI_LONG_LONG,sum,1 ,MPI_LONG_LONG,root ,MPI_COMM_WORLD );
+        // TODO: master
+    }
 
     if (world_rank == 0)
     {
         // TODO: PI result
-
+        pi_result = 4.0 * (double)count /(( double ) tosses);
         // --- DON'T TOUCH ---
         double end_time = MPI_Wtime();
         printf("%lf\n", pi_result);
