@@ -49,10 +49,9 @@ int main(int argc, char **argv)
     }
     else if (world_rank == 0)
     {
-        MPI_Status status; 
         long long int temp;
         for(int source = 1 ; source < world_size ; source++){
-            MPI_Recv(&temp, 1, MPI_LONG_LONG, source, 0, MPI_COMM_WORLD, &status);
+            MPI_Recv(&temp, 1, MPI_LONG_LONG, source, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             count += temp;
         }
         // TODO: master
