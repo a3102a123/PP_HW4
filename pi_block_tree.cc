@@ -44,7 +44,6 @@ int main(int argc, char **argv)
 
     int id = world_rank , time = 1;
     int dst , source;
-    MPI_Status status; 
     long long int temp;
 
     while (time < world_size){
@@ -55,7 +54,7 @@ int main(int argc, char **argv)
         }
         else{
 	     source = world_rank + time;
-             MPI_Recv(&temp, 1, MPI_LONG_LONG, source, 0, MPI_COMM_WORLD, &status);
+             MPI_Recv(&temp, 1, MPI_LONG_LONG, source, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
              count += temp;
         }
         time *= 2;
