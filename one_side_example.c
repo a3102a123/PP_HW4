@@ -45,7 +45,7 @@ int main (int argc, char **argv)
 
     if (rank == 0)
     {
-       int *oldschedule = malloc(size * sizeof(int));
+       int *oldschedule = (int *)malloc(size * sizeof(int));
        // Use MPI to allocate memory for the target window
        int *schedule;
        MPI_Alloc_mem(size * sizeof(int), MPI_INFO_NULL, &schedule);
