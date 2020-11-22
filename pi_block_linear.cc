@@ -20,17 +20,18 @@ int main(int argc, char **argv)
     long long int tosses = atoi(argv[1]);
     int world_rank, world_size;
     // ---
+
+    // TODO: init MPI
     MPI_Comm_size(MPI_COMM_WORLD,&world_size);
     MPI_Comm_rank(MPI_COMM_WORLD,&world_rank);
     long long int range = ceil(tosses / (float)world_size) , begin_idx = 0,begin,end; 
     static unsigned int seed = time(NULL) * world_rank;
     double distance_squared,x,y;
-    begin = range * world_rank;
-    end = min(range * (world_rank + 1) , tosses);
     long long int count = 0;
     int dst = 0;
 
-    // TODO: init MPI
+    begin = range * world_rank;
+    end = min(range * (world_rank + 1) , tosses);
 
     srand(seed);
     // TODO: handle workers
