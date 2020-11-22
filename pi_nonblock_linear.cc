@@ -46,7 +46,10 @@ int main(int argc, char **argv)
     if (world_rank > 0)
     {
         // TODO: MPI workers
-        MPI_Isend(&count ,1 ,MPI_LONG_LONG,dst ,0 ,MPI_COMM_WORLD ,MPI_STATUS_IGNORE );
+        MPI_Request rq;
+        MPI_Isend(&count ,1 ,MPI_LONG_LONG,dst ,0 ,MPI_COMM_WORLD ,&rq );
+        //printf("%d send %lld\n",world_rank,count);
+        //printf("%d done\n",world_rank);
     }
     else if (world_rank == 0)
     {
@@ -54,9 +57,11 @@ int main(int argc, char **argv)
         // Use MPI_Irecv, MPI_Wait or MPI_Waitall.
         MPI_Request requests[world_size];
         long long int temp[world_size];
-        for(int i = 0 ; i < world_size ; i++)
-            MPI_Irecv(temp + i, 1, MPI_LONG_LONG, i, 0, MPI_COMM_WORLD, requests + i)
-        MPI_Waitall(world_size, requests, MPI_STATUS_IGNORE);
+        for(int i = 1 ; i < world_size ; i++)
+            MPI_Irecv(temp + i, 1, MPI_LONG_LONG, i, 0, MPI_COMM_WORLD, requests + i);
+        MPI_Waitall(world_size - 1, requests + 1, MPI_STATUS_IGNORE);
+        for(int i = 1 ; i < world_size ; i++)
+          count += temp[i];
     }
 
     if (world_rank == 0)
