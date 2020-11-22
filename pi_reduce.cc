@@ -26,7 +26,7 @@ int main(int argc, char **argv)
     long long int range = ceil(tosses / (float)world_size) , begin_idx = 0,begin,end; 
     static unsigned int seed = time(NULL) * world_rank;
     double distance_squared,x,y;
-    long long int count = 0;
+    long long int count = 0,sum;
     int root = 0;
 
     begin = range * world_rank;
@@ -44,19 +44,18 @@ int main(int argc, char **argv)
 
     if (world_rank > 0)
     {
-        MPI_Reduce(&count ,1 ,MPI_LONG_LONG,NULL,1 ,MPI_LONG_LONG,root ,MPI_COMM_WORLD );
+        MPI_Reduce(&count ,NULL ,1 ,MPI_LONG_LONG ,MPI_SUM,root ,MPI_COMM_WORLD );
     }
     else if (world_rank == 0)
     {
-        long long int sum;
-        MPI_Reduce(&count ,1 ,MPI_LONG_LONG,sum,1 ,MPI_LONG_LONG,root ,MPI_COMM_WORLD );
+        MPI_Reduce(&count ,&sum ,1 ,MPI_LONG_LONG ,MPI_SUM,root ,MPI_COMM_WORLD );
         // TODO: master
     }
 
     if (world_rank == 0)
     {
         // TODO: PI result
-        pi_result = 4.0 * (double)count /(( double ) tosses);
+        pi_result = 4.0 * (double)sum /(( double ) tosses);
         // --- DON'T TOUCH ---
         double end_time = MPI_Wtime();
         printf("%lf\n", pi_result);
