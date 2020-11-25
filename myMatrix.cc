@@ -1,10 +1,13 @@
 #include<bits/stdc++.h>
 #include <mpi.h>
+
+using namespace std;
+
 void construct_matrices(int *n_ptr, int *m_ptr, int *l_ptr,int **a_mat_ptr, int **b_mat_ptr){
     int world_rank, world_size;
     MPI_Comm_size(MPI_COMM_WORLD,&world_size);
     MPI_Comm_rank(MPI_COMM_WORLD,&world_rank);
-    printf("Construct Matrix %d\n",world_rank);
+    // printf("Construct Matrix %d\n",world_rank);
     /*only MPI_COMM_WORLD rank 0 inherits stdin*/
     if (world_rank == 0)
     {
@@ -33,11 +36,12 @@ void matrix_multiply(const int n, const int m, const int l,const int *a_mat, con
     int world_rank, world_size;
     MPI_Comm_size(MPI_COMM_WORLD,&world_size);
     MPI_Comm_rank(MPI_COMM_WORLD,&world_rank);
-    printf("Calctulate Matrix in %d : %d\n",world_rank,*(a_mat+1));
+    // printf("Calctulate Matrix in %d : %d\n",world_rank,*(a_mat+1));
     // setup variable
-    int begin , end , block_size = ceil(n / world_size);
+    int begin , end , block_size = ceil(n / (float)world_size);
     begin = world_rank * block_size;
     end = min( (world_rank + 1) * block_size , n);
+    // printf("Process %d run [ %d - %d ]\n",world_rank,begin,end);
     int *result;
     int result_size;
     if (world_rank == 0)
@@ -51,14 +55,16 @@ void matrix_multiply(const int n, const int m, const int l,const int *a_mat, con
         result = (int *)malloc(sizeof(int) * result_size);
     }
     // calculate the matrix multiply
-    int *ptr,*a,*b;
+    const int *a,*b;
+    int *ptr;
     for(int i = begin ; i < end ; i++ ){
         for(int j = 0 ; j < l ; j++){
             ptr = result + (i - begin) * l + j;
             *ptr = 0;
             for(int k = 0 ; k < m ; k++){
                 a = a_mat + i * m + k;
-                b = b_mat + k * m + j;
+                b = b_mat + k * l + j;
+                // printf("%d * %d\n",*a,*b);
                 *ptr += (*a) * (*b);
             }
         }
@@ -69,8 +75,9 @@ void matrix_multiply(const int n, const int m, const int l,const int *a_mat, con
         for(int i = 1 ; i < world_size ; i++){
             begin = i * block_size;
             end = min( (i + 1) * block_size , n);
-            result_size = (end - begin) * l
-            ptr = result + begin;
+            result_size = (end - begin) * l;
+            ptr = result + begin * l;
+            // printf("Receive from process %d begin %d . size %d\n",world_rank,begin,result_size);
             MPI_Recv(ptr, result_size, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         }
 
@@ -94,7 +101,7 @@ void destruct_matrices(int *a_mat, int *b_mat){
     int world_rank, world_size;
     MPI_Comm_size(MPI_COMM_WORLD,&world_size);
     MPI_Comm_rank(MPI_COMM_WORLD,&world_rank);
-    printf("Destroy Matrix\n");
+    // printf("Destroy Matrix\n");
     free(a_mat);
     free(b_mat);
 }
