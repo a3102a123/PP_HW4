@@ -1,2 +1,2 @@
 all:
-	mpicxx main.cc myMatrix -o matmul
+	mpicxx main.cc myMatrix.cc -o matmul
