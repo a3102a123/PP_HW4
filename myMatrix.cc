@@ -34,12 +34,60 @@ void matrix_multiply(const int n, const int m, const int l,const int *a_mat, con
     MPI_Comm_size(MPI_COMM_WORLD,&world_size);
     MPI_Comm_rank(MPI_COMM_WORLD,&world_rank);
     printf("Calctulate Matrix in %d : %d\n",world_rank,*(a_mat+1));
+    // setup variable
+    int begin , end , block_size = ceil(n / world_size);
+    begin = world_rank * block_size;
+    end = min( (world_rank + 1) * block_size , n);
+    int *result;
+    int result_size;
     if (world_rank == 0)
     {
+        result_size = n * l;
+        result = (int *)malloc(sizeof(int) * result_size);
     }
     else if (world_rank > 0)
     {
+        result_size = (end - begin) * l;
+        result = (int *)malloc(sizeof(int) * result_size);
     }
+    // calculate the matrix multiply
+    int *ptr,*a,*b;
+    for(int i = begin ; i < end ; i++ ){
+        for(int j = 0 ; j < l ; j++){
+            ptr = result + (i - begin) * l + j;
+            *ptr = 0;
+            for(int k = 0 ; k < m ; k++){
+                a = a_mat + i * m + k;
+                b = b_mat + k * m + j;
+                *ptr += (*a) * (*b);
+            }
+        }
+    }
+    // send result to master
+    if(world_rank == 0)
+    {
+        for(int i = 1 ; i < world_size ; i++){
+            begin = i * block_size;
+            end = min( (i + 1) * block_size , n);
+            result_size = (end - begin) * l
+            ptr = result + begin;
+            MPI_Recv(ptr, result_size, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        }
+
+    }
+    else if (world_rank > 0){
+        MPI_Send(result ,result_size ,MPI_INT,0 ,0 ,MPI_COMM_WORLD );
+    }
+    // print result
+    if(world_rank == 0){
+        for(int i = 0 ; i < n ; i++){
+            for(int j = 0 ; j < l ; j++){
+                printf("%d ",*(result + (i * l) + j));
+            }
+            printf("\n");
+        }
+    }
+    free(result);
 }
 
 void destruct_matrices(int *a_mat, int *b_mat){
