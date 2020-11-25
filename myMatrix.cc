@@ -17,6 +17,7 @@ void construct_matrices(int *n_ptr, int *m_ptr, int *l_ptr,int **a_mat_ptr, int 
         for(int i = 0 ; i < *m_ptr ; i++)
             for(int j = 0 ; j < *l_ptr ; j++)
                 scanf("%d",*b_mat_ptr + i*(*l_ptr) + j);
+        MPI_Bcast(n_ptr, 1, MPI_INT, 0, MPI_COMM_WORLD);
         // for(int i = 0 ; i < *n_ptr ; i++){
         //     for(int j = 0 ; j < *m_ptr ; j++)
         //         printf("%d ",*(*a_mat_ptr + i*(*m_ptr) + j));\
@@ -28,6 +29,9 @@ void construct_matrices(int *n_ptr, int *m_ptr, int *l_ptr,int **a_mat_ptr, int 
         //     printf("\n");
         // }
     }
+    else if (world_rank > 0){
+        MPI_Recv(n_ptr, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    }
     MPI_Barrier(MPI_COMM_WORLD);
 }
 
@@ -35,11 +39,11 @@ void matrix_multiply(const int n, const int m, const int l,const int *a_mat, con
     int world_rank, world_size;
     MPI_Comm_size(MPI_COMM_WORLD,&world_size);
     MPI_Comm_rank(MPI_COMM_WORLD,&world_rank);
-    printf("Calctulate Matrix in %d : %d\n",world_rank,*a_mat);
-    if (world_rank > 0)
+    printf("Calctulate Matrix in %d : %d\n",world_rank,n);
+    if (world_rank == 0)
     {
     }
-    else if (world_rank == 0)
+    else if (world_rank > 0)
     {
     }
 }
@@ -49,10 +53,10 @@ void destruct_matrices(int *a_mat, int *b_mat){
     MPI_Comm_size(MPI_COMM_WORLD,&world_size);
     MPI_Comm_rank(MPI_COMM_WORLD,&world_rank);
     printf("Destroy Matrix\n");
-    if (world_rank > 0)
+    if (world_rank == 0)
     {
     }
-    else if (world_rank == 0)
+    else if (world_rank > 0)
     {
     }
 }
