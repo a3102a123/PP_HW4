@@ -9,14 +9,24 @@ void construct_matrices(int *n_ptr, int *m_ptr, int *l_ptr,int **a_mat_ptr, int 
     if (world_rank == 0)
     {
         scanf("%d %d %d",n_ptr,m_ptr,l_ptr);
-        a_mat_ptr = (*int) malloc( sizeof(int) * (*n_ptr) * (*m_ptr));
-        a_mat_ptr = (*int) malloc( sizeof(int) * (*m_ptr) * (*l_ptr));
-        for(int i = 0 ; i < n_ptr ; i++)
-            for(int j = 0 ; j < m_ptr ; j++)
-                scanf("%d",a_mat_ptr + i*(*m_ptr) + j);
-        for(int i = 0 ; i < m_ptr ; i++)
-            for(int j = 0 ; j < l_ptr ; j++)
-                scanf("%d",b_mat_ptr + i*(*l_ptr) + j);
+        *a_mat_ptr = (int *) malloc( sizeof(int) * (*n_ptr) * (*m_ptr));
+        *b_mat_ptr = (int *) malloc( sizeof(int) * (*m_ptr) * (*l_ptr));
+        for(int i = 0 ; i < *n_ptr ; i++)
+            for(int j = 0 ; j < *m_ptr ; j++)
+                scanf("%d",*a_mat_ptr + i*(*m_ptr) + j);
+        for(int i = 0 ; i < *m_ptr ; i++)
+            for(int j = 0 ; j < *l_ptr ; j++)
+                scanf("%d",*b_mat_ptr + i*(*l_ptr) + j);
+        // for(int i = 0 ; i < *n_ptr ; i++){
+        //     for(int j = 0 ; j < *m_ptr ; j++)
+        //         printf("%d ",*(*a_mat_ptr + i*(*m_ptr) + j));\
+        //     printf("\n");
+        // }
+        // for(int i = 0 ; i < *m_ptr ; i++){
+        //     for(int j = 0 ; j < *l_ptr ; j++)
+        //         printf("%d ",*(*b_mat_ptr + i*(*l_ptr) + j));
+        //     printf("\n");
+        // }
     }
     MPI_Barrier(MPI_COMM_WORLD);
 }
