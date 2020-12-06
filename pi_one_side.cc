@@ -23,7 +23,7 @@ int fnz (long long int *schedule, long long int *oldschedule, int size, long lon
         for (int i = 0; i < size; i++)
         {
             if(schedule[i] != oldschedule[i]){
-                printf("Receive %lld from %d\n", schedule[i],i);
+                // printf("Receive %lld from %d\n", schedule[i],i);
                 (*count) += schedule[i];
             }
             if(schedule[i] != 0)
