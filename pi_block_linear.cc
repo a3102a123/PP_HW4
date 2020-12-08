@@ -33,11 +33,11 @@ int main(int argc, char **argv)
     begin = range * world_rank;
     end = min(range * (world_rank + 1) , tosses);
 
-    srand(seed);
+    // srand(seed);
     // TODO: handle workers
     for(int i = begin ; i < end ; i++){
-        x = (double)rand_r() * inv_max  + (-1.0);
-        y = (double)rand_r() * inv_max  + (-1.0);
+        x = (double)rand_r(&seed) * inv_max  + (-1.0);
+        y = (double)rand_r(&seed) * inv_max  + (-1.0);
         distance_squared = x * x + y * y;
         if ( distance_squared <= 1)
             count++;
