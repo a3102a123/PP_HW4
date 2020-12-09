@@ -89,7 +89,10 @@ void matrix_multiply(const int n, const int m, const int l,const int *a_mat, con
     if(world_rank == 0){
         for(int i = 0 ; i < n ; i++){
             for(int j = 0 ; j < l ; j++){
-                printf("%d ",*(result + (i * l) + j));
+		if(j == l - 1)
+                    printf("%d",*(result + (i * l) + j));
+		else
+                    printf("%d ",*(result + (i * l) + j));
             }
             printf("\n");
         }
